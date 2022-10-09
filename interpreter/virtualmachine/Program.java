@@ -42,23 +42,26 @@ public class Program {
         // check if program ArrayList is not empty
         if (!this.program.isEmpty()) {
             HashMap<String,Integer> labels = new HashMap<>();
-            ArrayList<Integer> pending = new ArrayList<>();
+            ArrayList<Integer> unresolved = new ArrayList<>();
 
             // check every item on program ArrayList
             for (int i = 0; i < this.program.size(); i++) {
+                //check each item in the ArrayList of ByteCodes to see if they match JumpCodes
                 switch (this.program.get(i).getClass().getSimpleName()) {
-                    case "CallCode", "FalseBranchCode", "GotoCode" -> pending.add(i);
+                    //if matched add the ByteCode to the unresolved ArrayList to resolve once current process finishes
+                    case "CallCode", "FalseBranchCode", "GotoCode" -> unresolved.add(i);
                     case "LabelCode" -> {
-                        LabelCode bc = (LabelCode) this.program.get(i);
-                        labels.put(bc.getLabel(), i);
+                        LabelCode lc = (LabelCode) this.program.get(i);
+                        //store <ByteCode label, ByteCode position> into labels HashMap
+                        labels.put(lc.getLabel(), i);
                     }
                 }
             }
 
-            JumpCode bc;
-            for (int i : pending) {
-                bc = (JumpCode) this.program.get(i);
-                bc.setIndex(labels.get(bc.getAddress()));
+            JumpCode jc;
+            for (int i : unresolved) {
+                jc = (JumpCode) this.program.get(i);
+                jc.setIndex(labels.get(jc.getAddress()));
             }
         }
     }
